@@ -23,11 +23,12 @@ jobs:
       - name: Build
         run: |
           make bgc.html
-          mv bgc.html index.html
+          mkdir -p dist
+          mv bgc.html dist/index.html
         working-directory: translations/zh-CN/src
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: translations/zh-CN/src/index.html
+          path: translations/zh-CN/src/dist
   deploy:
     needs: build
     name: Deploy to GitHub Pages
