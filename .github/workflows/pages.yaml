@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build HTML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone https://github.com/beejjorgensen/bgbspd.git --depth=1
+        working-directory: translations
+      - name: Prepare pandoc
+        run: |
+          wget https://github.com/jgm/pandoc/releases/download/3.5/pandoc-3.5-1-amd64.deb
+          dpkg -i pandoc-3.5-1-amd64.deb
+      - name: Build
+        run: |
+          make bgc.html
+          mv bgc.html index.html
+        working-directory: translations/zh-CN/src
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 'github-pages'
+          path: translations/zh-CN/src/index.html
+  deploy:
+    needs: build
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/deploy-pages@v4
