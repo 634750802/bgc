@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build HTML
@@ -21,14 +25,16 @@ jobs:
           make bgc.html
           mv bgc.html index.html
         working-directory: translations/zh-CN/src
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
-          name: 'github-pages'
           path: translations/zh-CN/src/index.html
   deploy:
     needs: build
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       pages: write
       contents: read
